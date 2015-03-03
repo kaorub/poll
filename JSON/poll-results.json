@@ -1,0 +1,46 @@
+{
+    "user": "p1f9oayieu109r691872y4oht2o809f8ya",
+    "date": "2014-03-27 14:33",
+    "answers": [
+        {
+            "id": 1,
+            "value": "male"
+        },
+        {
+            "id": 2,
+            "value": 33
+        },
+        {
+            "id": 3,
+            "value": "China"
+        },
+        {
+            "id": 50,
+            "value": "Shanghai"
+        },
+        {
+            "id": 51,
+            "value": "Below RMB 1,000"
+        },
+        {
+            "id": 52,
+            "value": "Senior High School"
+        },
+        {
+            "id": 100,
+            "value": "Rural"
+        },
+        {
+            "id": 101,
+            "value": "Married"
+        },
+        {
+            "id": 102,
+            "value": ["I have a subscription to the opera", "I have five or more dogs at home"]
+        },
+        {
+            "id": 103,
+            "value": 4
+        }
+    ]
+}
