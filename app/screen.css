@@ -7,3 +7,6 @@ body {
   padding-bottom: 70px;
   height: 100vh;
 }
+.hiddenn {
+  /*display: none;*/
+}

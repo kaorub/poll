@@ -1,11 +1,13 @@
-		section.container(ng-controller="QuestionCtrl")
-			form
-				.form-group
-					label(for="answer") Question
-					input.form-control(type='text', placeholder='Your answer')
-					.checkbox
-						label.checkbox-inline Option one
-							input(type='checkbox', value='')
-					.radio
-						label.radio-inline Option one
-							input(type='radio', name='optionsRadios', id='optionsRadios1')
+section.container
+	form
+		.form-group(hide-directive, question = 'question', ng-view)
+			//- label(for="answer") {{question.title}}
+			//- input.hiddenn.form-control(type='text', placeholder='Your answer')
+			//- .checkbox.hiddenn
+			//- 	label.checkbox-inline
+			//- 		input(type='checkbox', value='')
+			//- 		span  Option one
+			//- .radio.hiddenn
+			//- 	label.radio-inline
+			//- 		input(type='radio', name='optionsRadios', id='optionsRadios1')
+			//- 		span 
