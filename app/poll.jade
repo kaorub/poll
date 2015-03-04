@@ -10,18 +10,20 @@ html
 		link(rel="stylesheet", href="screen.css")
 body(ng-app='app', ng-controller="MainCtrl")
 	noscript Please enable Javascript to experience this site :)
-	.container-fluid
-		header.container Poll Application
-		button.btn.btn-primary(ng-click='fetch();', ng-show='! id') Пройти опрос
+	nav.navbar.navbar-default.navbar-fixed-top
+		.container-fluid
+			header.container.centered Poll Application
+	button.btn.btn-primary.btn-lg.col-md-4.text-center(ng-click='fetch();', ng-show='! id') Пройти опрос
 	section.container(ng-hide='! id', currentQuestion)
-		h2 {{title}}
+		h2(go-title)
 		button.btn.btn-default(ng-click='setNextIndex();') Далее
 		div(ng-view)
 	footer.navbar.navbar-default.navbar-fixed-bottom
-		.container Created by Olga Malanova
-	script(src='components/jquery/dist/jquery.min.js')
+		.container.centered Created by Olga Malanova
+	
 	script(src='components/underscore/underscore-min.js')
 	script(src='components/angular/angular.min.js')
+	script(src='components/jquery/dist/jquery.min.js')
 	script(src='components/angular-route/angular-route.min.js')
 	script(src='components/bootstrap/dist/js/bootstrap.min.js')
 	//- script(src='//code.jquery.com/jquery-1.11.2.min.js')

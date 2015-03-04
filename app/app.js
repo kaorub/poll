@@ -2,60 +2,69 @@
 var app = angular.module('app', ['ngRoute']);
 
 app
+.config(['$routeProvider', function ($routeProvider) {
 
-.config(function ($routeProvider) {
- 
     $routeProvider.when("/question", {
         controller: "MainCtrl",
-        templateUrl: "app/views/question.html"
-    });
-    $routeProvider.otherwise({
+        templateUrl: "views/question.html"
+    })
+    .otherwise({
     	redirectTo: "/"
     });
- 	
-})
-.factory('startQuestion', ['jsonService', function(jsonService, $http, $scope) {
-	var promise = null;
-	if (promise) {
-		return promise
-	}
-	else {
-		promise = $http.get('JSON/poll-data.json');
-		promise.forEach(function(item, i) {
-			if (item.start) {
-				return item;
-			}
-			else return false;
-		})
-	}
+ 	// $locationProvider.html5Mode(true);
 }])
-.controller('MainCtrl', function($scope, $http, $route, $location, question) {
+
+.factory('getQuestion', ['$http', function($http) {
+	var fullObj = {questions: [], startObj: null};
+	var initial = function(arr) {
+		for (var obj in arr) {
+			if (arr[obj].hasOwnProperty('start')) {
+				return arr[obj];
+			}
+		}
+	};
+	$http.get('JSON/poll-data.json')
+	.success(function(data) {
+		fullObj.id = data.id;
+		fullObj.questions = data.questions;
+		fullObj.startObj = initial(data.questions);
+	})
+	.error(function(data, status) {
+		console.log(data);
+	});
+	return fullObj;
+}])
+
+.controller('MainCtrl', function($scope, $route, $location, getQuestion) {
 	$scope.$route = $route;
 	$scope.$location = $location;
-	$scope.question = {};
-	$location.path('/');
+	var arr = getQuestion.startObj;
 	$scope.fetch = function() {
 		$location.path('/question').replace();
-		// TODO parseJSON
+		$scope.title = getQuestion.startObj.title;
+		$scope.id = getQuestion.id;
+		$scope.questions = getQuestion.questions;
+		console.log($scope.id);
+		
 		// $http({
 		// 	method: 'GET',
 		// 	url: '/JSON/poll-data.json'
 		// })
-		question().success(function(data, status) {
-			$scope.title = data.title;
-			$scope.id = data.id;
-			var questionArray = data.questions;
-			questionArray.forEach(function(item, i) {
-				if (item.start) {
-					$scope.question = item;
-					console.log($scope.question);
-					return false;
-				}
-			});
-			// $scope.variants = item.variants
-		}).error(function(data, status) {
-			$scope.data = data || "Request failed";
-		})
+		// getQuestion().success(function(data, status) {
+		// $scope.title = data.title;
+		// $scope.id = data.id;
+		// 	var questionArray = data.questions;
+		// 	questionArray.forEach(function(item, i) {
+		// 		if (item.start) {
+		// 			$scope.question = item;
+		// 			console.log($scope.question);
+		// 			return false;
+		// 		}
+		// 	});
+		// 	// $scope.variants = item.variants
+		// }).error(function(data, status) {
+		// 	$scope.data = data || "Request failed";
+		// })
 	};
 	$scope.setNextIndex = function() {
 		$scope.currentIndex = $scope.next;
@@ -68,12 +77,16 @@ app
 		return $scope.currentIndex;
 	};
 })
-.directive("hideDirective", ['jsonService', function($compile) {
+.directive("hideDirective", function($compile, getQuestion) {
 	var stringTemplate = '<input class="form-control" />',
 		checkboxTemplate = '<div class="checkbox" ng-repeat="v in question.variants"><label class="radio-inline"><input type="radio" value="{{v.val}}"/><span> {{v.title}} </span></label></div>',
 		radioTemplate = '<div class="radio" ng-repeat="v in question.variants"><label class="radio-inline"><input type="radio" value=""/><span> {{v.title}} </span></label></div>',
 		rangeTemplate = '<div class="range" ng-repeat="v in question.variants">{{v}}</div>',
 		routerTemplate = '<div class="router" ng-repeat="v in question.variants">{{v}}</div>';
+	var list = getQuestion.questions;
+	console.log(list);
+	// var initialQuestion = getQuestion.startObj.title;
+	console.log(getQuestion.startObj);
 	var getTemplate = function(q) {
 		var template='';
 		switch (q.input) {
@@ -89,23 +102,27 @@ app
 		}
 		return template;
 	};
-	var getAnswers = function($scope, element, attrs) {
-		var template = getTemplate(question());
-		var linked = $compile(template);
-		var content = linked($scope);
-		element.append(content);
-	}
+	console.log(getTemplate(getQuestion.startObj));
+
 	return {
 		restrict: 'E',
 		replace: true,
-		link: getAnswers()
-		// link: function($scope, element, attrs) {
-		// 		console.log(element);
-		// 	// scope.$watch('question', function(question) {
-		// 		element.html(getTemplate($scope.question));
-		// 	// });
-		// 	// element.html(getTemplate(scope.question.input ? scope.question.input : 'input')).show();
-		// 	// $compile(element)(scope);
-		// }
+		template: getTemplate(getQuestion.startObj),
+		compile: function compile(templateElement, templateAttrs) {
+			templateElement.append(getTemplate);
+		},
+		link: function($scope, element, attrs) {
+
+		}
 	}
-}])
+})
+.directive('goTitle', function($compile, getQuestion) {
+	return {
+		compile: function compile(templateElement, templateAttrs) {
+			templateElement.append('{{title}}');
+		},
+		link: function($scope, element, attrs) {
+
+		}
+	}
+})

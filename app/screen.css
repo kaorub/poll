@@ -5,8 +5,24 @@ html {
 body {
   background-color: rgba(0, 0, 0, 0.5);
   padding-bottom: 70px;
+  padding-top: 70px;
   height: 100vh;
+  vertical-align: middle;
+}
+nav {
+	background-color: rgba(102, 153, 204, 0.5);
+}
+footer {
+	background-color: rgba(0, 0, 0, 0.5);	
+}
+header {
+	font-size: 2em;
 }
 .hiddenn {
   /*display: none;*/
+}
+.centered {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
