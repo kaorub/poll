@@ -19,7 +19,7 @@ module.exports = function (grunt) {
 	      }
 	    },
 	    files: {
-	      "app/poll.html": "app/poll.jade",
+	      "app/views/poll.html": "app/views/poll.jade",
         "app/views/question.html": "app/views/question.jade"
 	    }
 	 }

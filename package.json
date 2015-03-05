@@ -2,10 +2,11 @@
   "name": "poll",
   "version": "0.0.2",
   "devDependencies": {
+    "bootstrap-slider": "^4.5.0",
     "grunt": "~0.4.5",
+    "grunt-cli": "~0.1.13",
     "grunt-contrib-compass": "~0.6.0",
-    "grunt-contrib-jade": "~0.14.1",
-    "grunt-cli": "~0.1.13"
+    "grunt-contrib-jade": "~0.14.1"
   },
   "dependencies": {
     "git": "^0.1.5",
