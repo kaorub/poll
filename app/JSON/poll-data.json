@@ -12,7 +12,7 @@
             "description": null,
             "value": null,
             "datatype": "string",
-            "next": 2,
+            "next": 3,
             "variants": [
                 {
                     "title": "Male",
@@ -27,24 +27,6 @@
             ],
             "validates": {
                 "presence": true
-            }
-        },
-
-        {
-            "id": 2,
-            "input": "string",
-            "title": "What is your age?",
-            "description": null,
-            "value": "",
-            "datatype": "integer",
-            "next": 3,
-            "validates": {
-                "presence": true,
-                "numericality": {
-                    "only_integer": true,
-                    "min": 16,
-                    "max": 120
-                }
             }
         },
 

@@ -1,29 +1,38 @@
 html {
   font: 100% Arial 17px;
-  background-color: #f2f2f2;
 }
 body {
   background-color: rgba(0, 0, 0, 0.5);
   padding-bottom: 70px;
   padding-top: 70px;
-  height: 100vh;
   vertical-align: middle;
+  display: flex;
 }
 nav {
-	background-color: rgba(102, 153, 204, 0.5);
+	background-color: #f2f2f2;
+  text-align: center;
+
 }
 footer {
-	background-color: rgba(0, 0, 0, 0.5);	
+  background-color: #f2f2f2;
+  text-align: center;
 }
 header {
 	font-size: 2em;
+  color: #333333;
 }
 .centered {
-	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 section {
-  display: table;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFFFFF;
+  float: none;
   margin: 0 auto;
+}
+.question {
+  float: none;
 }

@@ -11,11 +11,19 @@ app
     })
     .when('/', {
     	templateUrl: "/"
-    });
+    })
+    .when('/result', {
+    	templateUrl: "result.html"
+    })
+    .otherwise({
+    	templateUrl: "poll.html"
+    })
 }])
 
 .factory('getQuestion', ['$http', function($http) {
+
 	var fullObj = {questions: [], startObj: null};
+
 	var initial = function(arr) {
 		for (var obj in arr) {
 			if (arr[obj].hasOwnProperty('start')) {
@@ -23,13 +31,7 @@ app
 			}
 		}
 	};
-	// var findById = function(id, arr) {
-	// 	for (var i in arr)  {
-	// 		if (arr[i].id == id) {
-	// 			return arr[i];
-	// 		}
-	// 	}
-	// }
+
 	$http.get('../JSON/poll-data.json')
 	.success(function(data) {
 		fullObj.id = data.id;
@@ -42,29 +44,41 @@ app
 	return fullObj;
 }])
 
-.controller('MainCtrl', function($scope, $route, $location, getQuestion) {
+.controller('MainCtrl', function($scope, $route, $location, $filter, getQuestion) {
 	$scope.$route = $route;
+	$scope.results = {};
+	$scope.results.answers = [];
 	$scope.$location = $location;
-	$scope.choices = {};
+	var orderBy = $filter('orderBy');
+	// Initialize questionnare
 	$scope.fetch = function(path) {
 		$location.path(path);
-		$scope.title = getQuestion.startObj.title;
-		// $scope.currentIndex = getQuestion.startObj.id;
+		// $scope.title = getQuestion.startObj.title;
 		//TODO Clear all
 		$scope.id = getQuestion.id;
+		$scope.results.id = $scope.id;
+		// Array of all the questions
 		$scope.questions = getQuestion.questions;
+		// Start question
 		$scope.startObj = getQuestion.startObj;
+		// The very start question's type
 		$scope.type = $scope.startObj.input;
+		// Variants of answer
+		$scope.variants = $scope.startObj.variants;
+		// Init start and second question's index
 		$scope.currentIndex = getQuestion.startObj.id;
 		$scope.nextIndex = getQuestion.startObj.next;
-		console.log($scope.currentIndex + ' ' + $scope.nextIndex);
 	};
-
+	// TODO function for ordering depends on position
+	$scope.order = function(predicate) {
+		$scope.variants = orderBy($scope.variants, predicate);
+	};
 	$scope.next = function() {
-
+		$scope.results.answers.push({id: $scope.currentIndex, value: $scope.value});
 		$scope.currentIndex = $scope.nextIndex;
-		console.log($scope.currentIndex + ' ' + $scope.nextIndex);
-		var arr = getQuestion.questions;
+		// console.log('currentIndex after lick next button' + $scope.currentIndex);
+		var arr = $scope.questions;
+
 		$scope.currentObj = function() {
 			var curObj = null;
 			for (var j in arr) {
@@ -76,25 +90,44 @@ app
 			return curObj;
 		}();
 
-		console.log($scope.currentObj);
+		if ($scope.currentObj.hasOwnProperty('finish')) {
+			$location.path('/result');
+		}
+
+		$scope.type = $scope.startObj.input;
 		$scope.startObj = $scope.currentObj;
 		$scope.nextIndex = $scope.startObj.next;
-		$scope.type = $scope.startObj.input;
-		$scope.title = $scope.startObj.title;
-		console.log($scope.startObj);
+		$scope.variants = $scope.startObj.variants;
+		if ($scope.type == 'checkbox') $scope.value = []
+			else $scope.value = '';
 	};
+	$scope.checkAnswer = function(type, answer) {
+
+		$scope.type = $scope.startObj.input;
+		if ($scope.type == 'router') {
+			$scope.nextIndex = answer.next;
+			$scope.value = answer.value;
+			return;
+		}
+
+		if (type == 'checkbox') {
+			$scope.value.push(answer.value);
+		} else {
+			$scope.value = answer.value;
+		}
+	}
 })
 .directive('variants', function($compile, getQuestion) {
-	var stringTemplate = '<h2>{{title}}</h2><input type="text" class="form-control" ng-model="choiced"/>',
-		checkboxTemplate = '<h2>{{title}}</h2><div class="{{startObj.input}}" ng-repeat="v in startObj.variants"><label class="checkbox-inline"><input type="{{startObj.input}}" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
-		radioTemplate = '<h2>{{title}}</h2><div class="{{startObj.input}}" ng-repeat="v in startObj.variants"><label class="radio-inline"><input type="radio" value=""/><span> {{v.title}} </span></label></div>',
-		// TODO Bootstrap-slider.js
-		rangeTemplate = '<h2>{{title}}</h2><div class="{{startObj.input}}" ng-model="choiced">{{v.title}}</div>',
-		routerTemplate = '<h2>{{title}}</h2><div class="{{startObj.input}}" ng-repeat="v in startObj.variants" ng-model="$parent.choiced">{{v.title}}</div>';
-
+	var tmp = 'position';
+	var checkboxTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants"><label class="checkbox-inline"><input type="{{startObj.input}}" ng-click="checkAnswer(type, v)" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
+		stringTemplate = '<h2>{{startObj.title}}</h2><div class="col-sm-10"><input type="{{startObj.input}}" name="input" ng-model="value" required ></div>',
+		radioTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants" ng-init="order(variants.position);"><label class="radio-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
+		rangeTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}"><slider class={{startObj.input}} min="{{startObj.min}} max="startObj.max" value="startObj.value">{{v.title}}</slider></div>',
+		routerTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants"><label class="router-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}};"/><span> {{v.title}} </span></label></div>';
 
 	var getTemplate = function(q) {
 		var template='';
+		console.log(q.input);
 		switch (q.input) {
 			case 'radio':
 				template = radioTemplate;
@@ -119,7 +152,7 @@ app
 	return {
 		compile: function compile(tElement, tAttrs) {
 			tElement.append(str);
-			console.log("!");
+			console.log("compile runs");
 			tAttrs.$observe('currentIndex', function(data) {
 				console.log(data);
 			}, true);
@@ -128,20 +161,11 @@ app
 		link: function(scope, element, attrs) {
 			scope.$watch('currentIndex', function() {
 				str = getTemplate(scope.startObj);
-				console.log(str);
+				console.log('link runs' + str);
+
 				element.append(str);
 				$compile(element)(scope);
 			})
 		}
 	}
 })
-// .directive('goTitle', function($compile, getQuestion) {
-// 	return {
-// 		compile: function compile(templateElement, templateAttrs) {
-// 			templateElement.append('{{title}}');
-// 		},
-// 		link: function($scope, element, attrs) {
-
-// 		}
-// 	}
-// })

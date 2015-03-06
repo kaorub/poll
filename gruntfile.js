@@ -20,13 +20,14 @@ module.exports = function (grunt) {
 	    },
 	    files: {
 	      "app/views/poll.html": "app/views/poll.jade",
-        "app/views/question.html": "app/views/question.jade"
+        "app/views/question.html": "app/views/question.jade",
+        "app/views/result.html": "app/views/result.jade"
 	    }
 	 }
   }
   });
  
-  grunt.loadNpmTasks('grunt-contrib-jade');
+  grunt.loadNpmTasks('grunt-contrib-jade', 'grunt-contrib-uglify');
    
   grunt.registerTask('default', [
     'jade'
