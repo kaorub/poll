@@ -1,55 +1,19 @@
-'use strict'
-var app = angular.module('app', ['ngRoute']);
-
-app
-
-.config(['$routeProvider', function ($routeProvider) {
-//TODO CONFIG.static_url
-    $routeProvider
-    .when("/question", {
-        templateUrl: "question.html"
-    })
-    .when('/', {
-    	templateUrl: "/"
-    })
-    .when('/result', {
-    	templateUrl: "result.html"
-    })
-    .otherwise({
-    	templateUrl: "poll.html"
-    })
-}])
-
-.factory('getQuestion', ['$http', function($http) {
-
-	var fullObj = {questions: [], startObj: null};
-
-	var initial = function(arr) {
-		for (var obj in arr) {
-			if (arr[obj].hasOwnProperty('start')) {
-				return arr[obj];
-			}
-		}
+(function() {
+	'use strict'
+	
+function startsWithPosition() {
+	return function(items) {
+		return items.filter(function(item) {
+			return 'orderBy'
+		});
 	};
+};
 
-	$http.get('../JSON/poll-data.json')
-	.success(function(data) {
-		fullObj.id = data.id;
-		fullObj.questions = data.questions;
-		fullObj.startObj = initial(data.questions);
-	})
-	.error(function(data, status) {
-		console.log(data);
-	});
-	return fullObj;
-}])
-
-.controller('MainCtrl', function($scope, $route, $location, $filter, getQuestion) {
+function MainCtrl ($scope, $route, $location, $filter, getQuestion) {
 	$scope.$route = $route;
 	$scope.results = {};
 	$scope.results.answers = [];
 	$scope.$location = $location;
-	var orderBy = $filter('orderBy');
 	// Initialize questionnare
 	$scope.fetch = function(path) {
 		$location.path(path);
@@ -70,9 +34,9 @@ app
 		$scope.nextIndex = getQuestion.startObj.next;
 	};
 	// TODO function for ordering depends on position
-	$scope.order = function(predicate) {
-		$scope.variants = orderBy($scope.variants, predicate);
-	};
+	// $scope.order = function(predicate) {
+	// 	$scope.variants = orderBy($scope.variants, predicate);
+	// };
 	$scope.next = function() {
 		$scope.results.answers.push({id: $scope.currentIndex, value: $scope.value});
 		$scope.currentIndex = $scope.nextIndex;
@@ -116,15 +80,66 @@ app
 			$scope.value = answer.value;
 		}
 	}
-})
+};
+
+function config($routeProvider) {
+//TODO CONFIG.static_url
+    $routeProvider
+    .when("/question", {
+        templateUrl: "question.html"
+    })
+    .when('/', {
+    	templateUrl: "/"
+    })
+    .when('/result', {
+    	templateUrl: "result.html"
+    })
+    .otherwise({
+    	templateUrl: "poll.html"
+    })
+};
+
+angular
+.module('app', ['ngRoute'])
+.config(config)
+
+.filter('startsWithPosition', startsWithPosition)
+
+.factory('getQuestion', ['$http', function getQuestion($http) {
+
+	var fullObj = {questions: [], startObj: null};
+
+	var initial = function(arr) {
+		for (var obj in arr) {
+			if (arr[obj].hasOwnProperty('start')) {
+				return arr[obj];
+			}
+		}
+	};
+
+	$http.get('../JSON/poll-data.json')
+	.success(function(data) {
+		fullObj.id = data.id;
+		fullObj.questions = data.questions;
+		fullObj.startObj = initial(data.questions);
+	})
+	.error(function(data, status) {
+		console.log(data);
+	});
+	return fullObj;
+}])
+
+.controller('MainCtrl', MainCtrl)
 .directive('variants', function($compile, getQuestion) {
 	var tmp = 'position';
-	var checkboxTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants"><label class="checkbox-inline"><input type="{{startObj.input}}" ng-click="checkAnswer(type, v)" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
+	var checkboxTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants | orderBy "><label class="checkbox-inline"><input type="{{startObj.input}}" ng-click="checkAnswer(type, v)" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
 		stringTemplate = '<h2>{{startObj.title}}</h2><div class="col-sm-10"><input type="{{startObj.input}}" name="input" ng-model="value" required ></div>',
 		radioTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants" ng-init="order(variants.position);"><label class="radio-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
 		rangeTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}"><slider class={{startObj.input}} min="{{startObj.min}} max="startObj.max" value="startObj.value">{{v.title}}</slider></div>',
-		routerTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants"><label class="router-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}};"/><span> {{v.title}} </span></label></div>';
-
+		routerTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants ' + '| orderBy: "v.position"' + '"><label class="router-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}};"/><span> {{v.title}} </span></label></div>';
+	var templateItem = function(elem, attrs) {
+		return '<h2>{{startObj.title}}</h2>' + '<div class="{{startObj.input}}"' + 'ng-repeat="v in variants | ' + 'orderBy: "v.position"' + '"><label class="checkbox-inline"><input type="{{startObj.input}}" ng-click="checkAnswer(type, v)" value="{{v.value}}"/><span> {{v.title}} </span></label></div>'
+	}
 	var getTemplate = function(q) {
 		var template='';
 		console.log(q.input);
@@ -169,3 +184,4 @@ app
 		}
 	}
 })
+})();
