@@ -1,5 +1,5 @@
 html {
-  font: 100% Arial 17px;
+  font-weight: 400;
 }
 body {
   background-color: rgba(0, 0, 0, 0.5);
@@ -7,6 +7,7 @@ body {
   padding-top: 70px;
   vertical-align: middle;
   display: flex;
+  font-family: 'Noto Sans', sans-serif;
 }
 nav {
 	background-color: #f2f2f2;

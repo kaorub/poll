@@ -5,8 +5,9 @@ html
 		title Poll Application
 		link(rel='stylesheet', href='../components/bootstrap/dist/css/bootstrap.min.css')
 		link(rel='stylesheet', href='../components/bootstrap/dist/css/bootstrap-theme.min.css')
-		link(rel="stylesheet", href="../screen.css")
-body(ng-app='app', ng-controller="MainCtrl")
+		link(href='http://fonts.googleapis.com/css?family=Noto+Sans&subset=cyrillic,latin', rel='stylesheet', type='text/css')
+		link(rel='stylesheet', href='../screen.css')
+body(ng-app='app', ng-controller='MainCtrl')
 	noscript Please enable Javascript to experience this site :)
 	nav.navbar.navbar-default.navbar-fixed-top
 		.container-fluid
@@ -14,7 +15,7 @@ body(ng-app='app', ng-controller="MainCtrl")
 				a(ng-href='/app/views/poll.html') Poll Application
 	button.btn.btn-primary.center-block(ng-click='fetch("/question");', ng-show='! id') Пройти опрос
 	section.col-xs-10.container(ng-hide='! id')
-		div.question.btn-lg.col-md-4.center-block(ng-view)
+		question.btn-lg.col-md-4.center-block(ng-view)
 	footer.navbar.navbar-default.navbar-fixed-bottom
 		.container.centered Created by Olga Malanova
 	script(src='../components/underscore/underscore-min.js')

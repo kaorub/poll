@@ -1,6 +1,9 @@
 (function() {
 	'use strict'
-	
+/** 
+ * @name startsWithPosition
+ * @desc Main application filtering NOT finished
+ */
 function startsWithPosition() {
 	return function(items) {
 		return items.filter(function(item) {
@@ -8,7 +11,10 @@ function startsWithPosition() {
 		});
 	};
 };
-
+/** 
+ * @name QuestionService
+ * @desc Main application Service
+ */
 function QuestionService($resource) {
 	var QuestionService = {};
 	QuestionService.questions = [];
@@ -131,68 +137,16 @@ angular
 
 // .filter('startsWithPosition', startsWithPosition)
 
-// .factory('getQuestion', ['$http', function getQuestion($http) {
-
-// 	var fullObj = {questions: [], startObj: null};
-
-// 	var initial = function(arr) {
-// 		for (var obj in arr) {
-// 			if (arr[obj].hasOwnProperty('start')) {
-// 				return arr[obj];
-// 			}
-// 		}
-// 	};
-
-// 	$http.get('../JSON/poll-data.json')
-// 	.success(function(data) {
-// 		fullObj.id = data.id;
-// 		fullObj.questions = data.questions;
-// 		fullObj.startObj = initial(data.questions);
-// 	})
-// 	.error(function(data, status) {
-// 		console.log(data);
-// 	});
-// 	return fullObj;
-// }])
-
-.factory('QuestionService', ['$http', QuestionService])
+.service('QuestionService', ['$http', QuestionService])
 
 .controller('MainCtrl', MainCtrl)
 
 .directive('variants', function($compile, QuestionService) {
-	var checkboxTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants | ' + "orderBy: '-position'" + '"><label class="checkbox-inline"><input type="{{startObj.input}}" ng-click="checkAnswer(type, v)" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
-		stringTemplate = '<h2>{{startObj.title}}</h2><div class="col-sm-10"><input type="{{startObj.input}}" name="input" ng-model="value" required ></div>',
-		radioTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants | ' + "orderBy: '-position'" + '"><label class="radio-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}}"/><span> {{v.title}} </span></label></div>',
-		rangeTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}"><slider class={{startObj.input}} min="{{startObj.min}} max="startObj.max" value="startObj.value">{{v.title}}</slider></div>',
-		routerTemplate = '<h2>{{startObj.title}}</h2><div class="{{startObj.input}}" ng-repeat="v in variants ' + "| orderBy: '-position'" + '"><label class="router-inline"><input type="radio" ng-click="checkAnswer(type, v);" value="{{v.value}};"/><span> {{v.title}} </span></label></div>';
-	var templateItem = function(elem, attrs) {
-		return '<h2>{{startObj.title}}</h2>' + '<div class="{{startObj.input}}"' + 'ng-repeat="v in variants | ' + "orderBy: '-position'" + '"><label class="checkbox-inline"><input type="{{startObj.input}}" ng-click="checkAnswer(type, v)" value="{{v.value}}"/><span> {{v.title}} </span></label></div>'
-	}
-	var getTemplate = function(q) {
-		var template='';
-		console.log(q.input);
-		switch (q.input) {
-			case 'radio':
-				template = radioTemplate;
-				break;
-			case 'checkbox':
-				template = checkboxTemplate;
-				break;
-			case 'string':
-				template = stringTemplate;
-				break;
-			case 'router':
-				template = routerTemplate;
-				break;
-			case 'range':
-				template = rangeTemplate;
-				break;
-		}
-		return template;
+	var templateItem = function(obj) {
+		var objType = obj.input + '-inline';
+		return '<h2>' + obj.title + '</h2><div class="' + obj.input + '" ng-repeat="v in variants"><label ' + "orderBy: '-position'" + '"><input type="' + obj.input + '" ng-click="checkAnswer(type, v)" value="{{v.value}}"/>{{v.title}}</label></div>'
 	};
-	console.log(QuestionService.startObj);
-	var str = getTemplate(QuestionService.startObj);
-
+	var str = templateItem(QuestionService.startObj)
 	return {
 		compile: function compile(tElement, tAttrs) {
 			tElement.append(str);
@@ -204,13 +158,15 @@ angular
 		// TODO
 		link: function(scope, element, attrs) {
 			scope.$watch('currentIndex', function() {
-				str = getTemplate(scope.startObj);
+				// str = getTemplate(scope.startObj);
+				str = templateItem(scope.startObj)
 				console.log('link runs' + str);
 
 				element.append(str);
 				$compile(element)(scope);
 			})
 		}
+		// template: templateItem
 	}
 })
 })();
